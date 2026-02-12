@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useEffect, useState } from 'react';
 import { Users, MessageSquare, TrendingUp, Flame } from 'lucide-react';
 import axios from 'axios';
@@ -18,7 +19,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/leads', {
+      const response = await axios.get(`${API_URL}/api/leads', {
         headers: { Authorization: `Bearer ${token}` },
       });
       

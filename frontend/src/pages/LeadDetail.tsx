@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Mail, Phone, Building, Briefcase } from 'lucide-react';

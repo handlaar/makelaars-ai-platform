@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Plus } from 'lucide-react';
@@ -19,7 +20,7 @@ export default function Leads() {
       if (search) params.search = search;
       if (filter !== 'all') params.temperature = filter;
 
-      const response = await axios.get('http://localhost:3000/api/leads', {
+      const response = await axios.get(`${API_URL}/api/leads', {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
