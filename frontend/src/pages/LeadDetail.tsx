@@ -15,7 +15,7 @@ export default function LeadDetail() {
   const fetchLead = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/leads/${id}`, {
+      const response = await axios.get(`${API_URL}/api/leads/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLead(response.data);
