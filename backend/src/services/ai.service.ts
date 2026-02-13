@@ -1,61 +1,26 @@
 import OpenAI from 'openai';
 import { PrismaClient } from '@prisma/client';
+import { calculateLeadScore } from '../utils/leadScoring';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const prisma = new PrismaClient();
 
 export const scoreLeadWithAI = async (lead: any) => {
-  let score = 0;
-  let notes = [];
-  
-  // Boom Sales Machine Scoring Rules
-  if (['CEO', 'Founder', 'COO'].some(title => lead.jobTitle?.includes(title))) {
-    if (lead.companySize >= 50 && lead.companySize <= 500) {
-      score += 30;
-      notes.push('🔥 C-level bij ideale bedrijfsgrootte');
-    }
-  }
-  
-  if (['VP Sales', 'Head of Sales'].some(title => lead.jobTitle?.includes(title))) {
-    if (lead.companySize >= 100) {
-      score += 25;
-      notes.push('💼 Sales leadership bij schaalbaar bedrijf');
-    }
-  }
-  
-  if (['SaaS', 'Tech', 'Professional Services', 'Marketing'].some(ind => lead.industry?.includes(ind))) {
-    score += 20;
-    notes.push('✅ Target industrie');
-  }
-  
-  if (lead.companySize < 10) {
-    score -= 30;
-    notes.push('⚠️ Te klein bedrijf');
-  }
-  
-  if (['Retail', 'Horeca'].some(ind => lead.industry?.includes(ind))) {
-    score -= 20;
-    notes.push('❌ Non-target sector');
-  }
-  
-  // Determine temperature
-  let temperature = 'cold';
-  if (score >= 70) temperature = 'hot';
-  else if (score >= 40) temperature = 'warm';
-  
-  // Determine next action
-  let nextAction = 'Kwalificeren via LinkedIn';
-  if (temperature === 'hot') nextAction = 'Direct bellen voor demo';
-  else if (temperature === 'warm') nextAction = 'Gepersonaliseerde email sturen';
+  // Use the deterministic scoring function
+  const scoringResult = calculateLeadScore({
+    jobTitle: lead.jobTitle,
+    companySize: lead.companySize,
+    industry: lead.industry
+  });
   
   // Update lead in database
   const updatedLead = await prisma.lead.update({
     where: { id: lead.id },
     data: {
-      score,
-      temperature,
-      nextAction,
-      aiNotes: notes.join(' | '),
+      score: scoringResult.score,
+      temperature: scoringResult.temperature.toLowerCase(),
+      nextAction: scoringResult.nextAction,
+      aiNotes: scoringResult.aiNotes,
     },
   });
   
