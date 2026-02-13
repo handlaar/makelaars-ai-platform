@@ -8,48 +8,61 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String
+  companyName   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
   leads         Lead[]
   conversations Conversation[]
 }
 
 model Lead {
-  id          String   @id @default(uuid())
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  jobTitle    String?
-  companySize Int?
-  industry    String?
-  linkedinUrl String?
-  score       Int      @default(0)
-  temperature String   @default("cold")
-  status      String   @default("new")
-  nextAction  String?
-  aiNotes     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id            String    @id @default(uuid())
+  name          String
+  email         String
+  phone         String?
+  company       String?
+  jobTitle      String?
+  companySize   Int?
+  industry      String?
+  linkedinUrl   String?
+  score         Int       @default(0)
+  temperature   String    @default("cold")
+  status        String    @default("new")
+  nextAction    String?
+  aiNotes       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
   userId        String
-  user          User           @relation(fields: [userId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
   conversations Conversation[]
 }
 
 model Conversation {
-  id        String   @id @default(uuid())
-  messages  Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  channel   String?
+  status    String    @default("active")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  leadId    String
+  lead      Lead      @relation(fields: [leadId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  messages  Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
   
-  leadId String
-  lead   Lead   @relation(fields: [leadId], references: [id])
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
