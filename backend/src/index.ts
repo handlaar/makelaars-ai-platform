@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes';
 import leadRoutes from './routes/lead.routes';
 import conversationRoutes from './routes/conversation.routes';
 import aiRoutes from './routes/ai.routes';
+import apolloRoutes from './routes/apollo.routes';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/apollo', apolloRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
