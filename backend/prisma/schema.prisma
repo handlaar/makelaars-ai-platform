@@ -8,13 +8,12 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  name        String
-  companyName String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   
   leads         Lead[]
   conversations Conversation[]
@@ -29,6 +28,7 @@ model Lead {
   jobTitle    String?
   companySize Int?
   industry    String?
+  linkedinUrl String?
   score       Int      @default(0)
   temperature String   @default("cold")
   status      String   @default("new")
@@ -44,24 +44,12 @@ model Lead {
 
 model Conversation {
   id        String   @id @default(uuid())
-  channel   String
-  status    String   @default("active")
+  messages  Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  leadId   String
-  lead     Lead      @relation(fields: [leadId], references: [id])
-  userId   String
-  user     User      @relation(fields: [userId], references: [id])
-  messages Message[]
-}
-
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  sender    String
-  createdAt DateTime @default(now())
-  
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
