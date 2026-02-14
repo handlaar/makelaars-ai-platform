@@ -1,196 +1,123 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
-import axios from 'axios';
-import NewLeadModal from '../components/NewLeadModal';
+import LeadCard from '../components/LeadCard';
+import LeadModal from '../components/LeadModal';
+import { Lead } from '../types';
 
-interface Lead {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  company?: string;
-  jobTitle?: string;
-  leadScore?: number;
-  leadTemperature?: 'Hot' | 'Warm' | 'Cold';
-  sequenceStatus?: string;
-  lastContactDate?: string;
-}
+const Leads = () => {
+    const [leads, setLeads] = useState<Lead[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterTemperature, setFilterTemperature] = useState('all');
 
-const Leads: React.FC = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [temperatureFilter, setTemperatureFilter] = useState<string>('Alle Temperaturen');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    useEffect(() => {
+          fetchLeads();
+    }, [filterStatus, filterTemperature]);
 
-  const fetchLeads = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/leads', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setLeads(response.data);
-    } catch (error) {
-      console.error('Error fetching leads:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const fetchLeads = async () => {
+          try {
+                  const token = localStorage.getItem('token');
+                  if (!token) {
+                            console.error('No token found');
+                            return;
+                  }
 
-  useEffect(() => {
-    fetchLeads();
-  }, []);
+            let url = `${import.meta.env.VITE_API_URL}/api/leads?`;
+                  if (filterStatus !== 'all') url += `status=${filterStatus}&`;
+                  if (filterTemperature !== 'all') url += `temperature=${filterTemperature}&`;
 
-  const filteredLeads = leads.filter(lead => {
-    const matchesSearch = 
-      lead.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesTemperature = 
-      temperatureFilter === 'Alle Temperaturen' || 
-      lead.leadTemperature === temperatureFilter;
+            const response = await fetch(url, {
+                      headers: { Authorization: `Bearer ${token}` },
+            });
 
-    return matchesSearch && matchesTemperature;
-  });
+            // Defensive check: only set leads if response.data is an array
+            if (Array.isArray(response.data)) {
+                      setLeads(response.data);
+            } else {
+                      console.error('Invalid response format:', response.data);
+                      setLeads([]);
+            }
+          } catch (error) {
+                  console.error('Error fetching leads:', error);
+                  setLeads([]);
+          }
+    };
 
-  const getTemperatureColor = (temp?: string) => {
-    switch (temp) {
-      case 'Hot': return 'bg-red-100 text-red-800';
-      case 'Warm': return 'bg-orange-100 text-orange-800';
-      case 'Cold': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+    const filteredLeads = leads.filter((lead) =>
+          lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()))
+                                         );
 
-  return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-          <p className="text-gray-600">Beheer al je leads op één plek</p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={20} />
-          Nieuwe Lead
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b border-gray-200 flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Zoek op naam, email of bedrijf..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <select
-            value={temperatureFilter}
-            onChange={(e) => setTemperatureFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option>Alle Temperaturen</option>
-            <option>Hot</option>
-            <option>Warm</option>
-            <option>Cold</option>
-          </select>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Naam
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Bedrijf
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Score
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Temperatuur
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acties
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                    Laden...
-                  </td>
-                </tr>
-              ) : filteredLeads.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                    Geen leads gevonden
-                  </td>
-                </tr>
-              ) : (
-                filteredLeads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {lead.firstName} {lead.lastName}
-                      </div>
-                      <div className="text-sm text-gray-500">{lead.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{lead.company || '-'}</div>
-                      <div className="text-sm text-gray-500">{lead.jobTitle || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {lead.leadScore || '-'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {lead.leadTemperature && (
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getTemperatureColor(lead.leadTemperature)}`}>
-                          {lead.leadTemperature}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {lead.sequenceStatus || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button className="text-blue-600 hover:text-blue-800">
-                        Bekijk
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <NewLeadModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onLeadCreated={fetchLeads}
-      />
-    </div>
-  );
+    return (
+          <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                        <h1 className="text-3xl font-bold text-gray-900">Leads</h1>h1>
+                        <button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                  >
+                                  <Plus size={20} />
+                                  Nieuwe Lead
+                        </button>button>
+                </div>div>
+          
+                <div className="flex gap-4">
+                        <div className="flex-1 relative">
+                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                  <input
+                                                type="text"
+                                                placeholder="Zoek leads..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                              />
+                        </div>div>
+                        <select
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  >
+                                  <option value="all">Alle Statussen</option>option>
+                                  <option value="new">Nieuw</option>option>
+                                  <option value="contacted">Gecontacteerd</option>option>
+                                  <option value="qualified">Gekwalificeerd</option>option>
+                                  <option value="proposal">Voorstel</option>option>
+                                  <option value="won">Gewonnen</option>option>
+                                  <option value="lost">Verloren</option>option>
+                        </select>select>
+                        <select
+                                    value={filterTemperature}
+                                    onChange={(e) => setFilterTemperature(e.target.value)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  >
+                                  <option value="all">Alle Temperaturen</option>option>
+                                  <option value="hot">Hot</option>option>
+                                  <option value="warm">Warm</option>option>
+                                  <option value="cold">Cold</option>option>
+                        </select>select>
+                </div>div>
+          
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredLeads.map((lead) => (
+                      <LeadCard key={lead.id} lead={lead} onUpdate={fetchLeads} />
+                    ))}
+                </div>div>
+          
+            {filteredLeads.length === 0 && (
+                    <div className="text-center py-12">
+                              <p className="text-gray-500">Geen leads gevonden</p>p>
+                    </div>div>
+                )}
+          
+                <LeadModal
+                          isOpen={isModalOpen}
+                          onClose={() => setIsModalOpen(false)}
+                          onSuccess={fetchLeads}
+                        />
+          </div>div>
+        );
 };
 
-export default Leads;
+export default Leads;</div>
