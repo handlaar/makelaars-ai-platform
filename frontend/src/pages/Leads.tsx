@@ -98,9 +98,10 @@ const Leads = () => {
                             
                                       <select
                                                       value={filterTemperature}
-                                                      onChange={(e) => setFilterTemperature(e.target.value)}
+                                                      onChange={(e) => setFilterTemperature(e.target.value)
                                                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                    >
+                                                    1
+                                  
                                                   <option value="all">Alle Temperaturen</option>option>
                                                   <option value="hot">Hot</option>option>
                                                   <option value="warm">Warm</option>option>
@@ -110,19 +111,18 @@ const Leads = () => {
                     </div>div>
               
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredLeads.map((lead) => (
                             <LeadCard key={lead.id} lead={lead} onUpdate={fetchLeads} />
                           ))}
                     </div>div>
               
                   {filteredLeads.length === 0 && (
-                          <div className="text-center py-12">
+                          <div className="text-center py-
                                     <p className="text-gray-500">Geen leads gevonden</p>p>
                           </div>div>
                     )}
               
                   {isModalOpen && (
-                          <LeadModal
+                          <Lead
                                         onClose={() => setIsModalOpen(false)}
                                         onSuccess={() => {
                                                         setIsModalOpen(false);
