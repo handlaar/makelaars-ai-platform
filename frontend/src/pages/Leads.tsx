@@ -14,7 +14,7 @@ export default function Leads() {
     try {
       const token = localStorage.getItem('token');
       const params = filter !== 'all' ? `?temperature=${filter}` : '';
-      const response = await fetch(`http://localhost:3000/api/leads${params}`, {
+      const response = await fetch(`https://makelaars-ai-backend.onrender.com/api/leads${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
