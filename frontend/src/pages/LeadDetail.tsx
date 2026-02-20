@@ -1,4 +1,4 @@
-import { API_URL } from '../config';
+import { API_URL} from '../config';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Mail, Phone, Building, Briefcase } from 'lucide-react';
@@ -32,7 +32,7 @@ export default function LeadDetail() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{lead.name}</h1>
-            <p className="text-gray-600 mt-1">{lead.jobTitle} bij {lead.company}</p>
+            <p className="text-gray-600 mt-1">{lead.jobTitle} bij {lead.companyName}</p>
           </div>
           <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
             lead.temperature === 'hot' ? 'bg-red-100 text-red-700' :
@@ -65,7 +65,7 @@ export default function LeadDetail() {
               <Building className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-sm text-gray-500">Bedrijf</p>
-                <p className="text-gray-900">{lead.company || '-'}</p>
+                <p className="text-gray-900">{lead.companyName || '-'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
