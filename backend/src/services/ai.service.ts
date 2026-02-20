@@ -29,8 +29,8 @@ export const scoreLeadWithAI = async (lead: any) => {
 
 export const generateEmailDraft = async (lead: any, flow: 'warm' | 'hot') => {
   const prompt = flow === 'hot' 
-    ? `Schrijf een directe, zakelijke email voor ${lead.name} (${lead.jobTitle} bij ${lead.company}). Ze zijn een HOT lead. Bied direct een demo aan van onze Boom Sales Machine. Tone: professioneel, resultaatgericht, geen hype.`
-    : `Schrijf een warme, gepersonaliseerde email voor ${lead.name} (${lead.jobTitle} bij ${lead.company}). Ze zijn een WARM lead. Introduceer de Boom Sales Machine en vraag naar hun huidige sales challenges. Tone: vriendelijk maar professioneel.`;
+    ? `Schrijf een directe, zakelijke email voor ${lead.name} (${lead.jobTitle} bij ${lead.companyName}). Ze zijn een HOT lead. Bied direct een demo aan van onze Boom Sales Machine. Tone: professioneel, resultaatgericht, geen hype.`
+    : `Schrijf een warme, gepersonaliseerde email voor ${lead.name} (${lead.jobTitle} bij ${lead.companyName}). Ze zijn een WARM lead. Introduceer de Boom Sales Machine en vraag naar hun huidige sales challenges. Tone: vriendelijk maar professioneel.`;
   
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
