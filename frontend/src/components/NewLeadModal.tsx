@@ -13,7 +13,7 @@ const NewLeadModal: React.FC<NewLeadModalProps> = ({ isOpen, onClose, onLeadCrea
     firstName: '',
     lastName: '',
     email: '',
-    company: '',
+    companyName: '',
     jobTitle: '',
     companySize: '',
     industry: ''
@@ -42,7 +42,7 @@ const NewLeadModal: React.FC<NewLeadModalProps> = ({ isOpen, onClose, onLeadCrea
         firstName: '',
         lastName: '',
         email: '',
-        company: '',
+        companyName: '',
         jobTitle: '',
         companySize: '',
         industry: ''
@@ -127,8 +127,8 @@ const NewLeadModal: React.FC<NewLeadModalProps> = ({ isOpen, onClose, onLeadCrea
             </label>
             <input
               type="text"
-              name="company"
-              value={formData.company}
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
