@@ -50,11 +50,7 @@ export default function Leads() {
             <button
               key={temp}
               onClick={() => setFilter(temp as any)}
-              className={`px-4 py-2 rounded-lg ${
-                filter === temp
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-4 py-2 rounded-lg ${filter === temp ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
             >
               {temp.charAt(0).toUpperCase() + temp.slice(1)}
             </button>
@@ -81,7 +77,7 @@ export default function Leads() {
                   <div className="text-sm text-gray-500">{lead.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {lead.company || '-'}
+                  {lead.companyName || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {lead.score}
